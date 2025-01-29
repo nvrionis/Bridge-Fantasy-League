@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bridge Pair Selection</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            background-color: #f4f4f4;
+            padding: 20px;
+        }
+        .container {
+            max-width: 90%;
+            margin: auto;
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+            gap: 10px;
+            margin: 20px 0;
+        }
+        .player {
+            padding: 10px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            cursor: pointer;
+            background-color: white;
+            transition: background-color 0.3s ease-in-out, color 0.3s ease-in-out;
+            font-weight: bold;
+            text-align: center;
+            word-wrap: break-word;
+            font-size: clamp(12px, 2vw, 16px);
+            color: black;
+        }
+        .player:hover {
+            background-color: #d1ecf1;
+            color: black;
+        }
+        .selected {
+            background-color: #4CAF50;
+            color: white;
+            border-color: #388E3C;
+        }
+        .stats {
+            font-size: clamp(14px, 3vw, 18px);
+            margin: 10px 0;
+        }
+        button {
+            padding: 10px 15px;
+            border: none;
+            background-color: #FF6347;
+            color: white;
+            font-size: 16px;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        button:hover {
+            background-color: #d9534f;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Pick Your Bridge Pairs</h1>
+        <p class="stats">Budget: <span id="budget">100</span> credits | Picks: <span id="picks">0</span>/5</p>
+        <div class="grid" id="playerGrid"></div>
+        <button onclick="resetSelection()">Reset</button>
+    </div>
+    <script>
+        const budgetLimit = 48;
+        let budget = budgetLimit;
+        let picks = 0;
+        const maxPicks = 5;
+        
+        const pairs = [
+            { player1: "Βρούστης", player2: "Δελημπαλταδάκης", price: 15 },
+            { player1: "Δοξιάδης", player2: "Ρούσσος", price: 14 },
+            { player1: "Παπακυριακόπουλος", player2: "Φίλιος", price: 14 },
+            { player1: "Καναβός", player2: "Ζώτος", price: 13 },
+            { player1: "Παπαγιάννης", player2: "Μπανίκας", price: 13 },
+            { player1: "Σαπουνάκης", player2: "Πρωτονοτάριος", price: 12 },
+            { player1: "Καραμανλής", player2: "Κουκουσέλης", price: 12 },
+            { player1: "Μπόζεμπερκ", player2: "Διονυσόπουλος", price: 12 }
+        ];
+        
+        const grid = document.getElementById("playerGrid");
+        const budgetEl = document.getElementById("budget");
+        const picksEl = document.getElementById("picks");
+        
+        pairs.forEach((pair, index) => {
+            const cell = document.createElement("div");
+            cell.classList.add("player");
+            cell.innerHTML = `${pair.player1} & ${pair.player2} <br> Price: ${pair.price}cr`;
+            cell.dataset.index = index;
+            grid.appendChild(cell);
+        });
+
+        grid.addEventListener("click", (e) => {
+            if (!e.target.classList.contains("player")) return;
+            const index = e.target.dataset.index;
+            const pair = pairs[index];
+            
+            if (e.target.classList.contains("selected")) {
+                e.target.classList.remove("selected");
+                budget += pair.price;
+                picks--;
+            } else {
+                if (budget < pair.price || picks >= maxPicks) return;
+                e.target.classList.add("selected");
+                budget -= pair.price;
+                picks++;
+            }
+
+            budgetEl.textContent = budget;
+            picksEl.textContent = picks;
+        });
+
+        function resetSelection() {
+            document.querySelectorAll(".player").forEach(cell => cell.classList.remove("selected"));
+            budget = budgetLimit;
+            picks = 0;
+            budgetEl.textContent = budget;
+            picksEl.textContent = picks;
+        }
+    </script>
+</body>
+</html>
