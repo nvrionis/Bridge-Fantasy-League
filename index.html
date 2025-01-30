@@ -34,7 +34,6 @@
             transition: background-color 0.3s ease-in-out, color 0.3s ease-in-out;
             font-weight: bold;
             text-align: center;
-            word-wrap: break-word;
             font-size: clamp(12px, 2vw, 16px);
             color: black;
         }
@@ -47,29 +46,21 @@
             color: white;
             border-color: #388E3C;
         }
-        .stats {
-            font-size: clamp(14px, 3vw, 18px);
-            margin: 10px 0;
-        }
-        button {
-            padding: 10px 15px;
-            border: none;
-            background-color: #FF6347;
-            color: white;
-            font-size: 16px;
-            border-radius: 5px;
-            cursor: pointer;
-            transition: background-color 0.3s;
-        }
-        button:hover {
-            background-color: #d9534f;
+        .disabled:not(.selected) {
+            background-color: #ccc !important;
+            color: #666 !important;
+            cursor: not-allowed;
+            border-color: #aaa;
         }
     </style>
 </head>
 <body>
-    <div class="container">
+    <div class="header">
         <h1>Pick Your Bridge Pairs</h1>
-        <p class="stats">Budget: <span id="budget">48</span> credits | Picks: <span id="picks">0</span>/5</p>
+        <p>Budget: <span id="budget">48</span> credits | Picks: <span id="picks">0</span>/5</p>
+        <p id="warning" class="warning" style="color: red; font-weight: bold; display: none;">Warning: Not enough credits to get 5 picks!</p>
+    </div>
+    <div class="container content">
         <div class="grid" id="playerGrid"></div>
         <button onclick="resetSelection()">Reset</button>
     </div>
@@ -78,7 +69,12 @@
         let budget = budgetLimit;
         let picks = 0;
         const maxPicks = 5;
-        
+
+        const budgetEl = document.getElementById("budget");
+        const picksEl = document.getElementById("picks");
+        const warningEl = document.getElementById("warning");
+        const grid = document.getElementById("playerGrid");
+
         const pairs = [
             { player1: "Βρούστης", player2: "Δελημπαλταδάκης", price: 15 },
             { player1: "Δοξιάδης", player2: "Ρούσσος", price: 14 },
@@ -104,6 +100,7 @@
             { player1: "Κάτσαρης", player2: "Σοφιός", price: 7 },
             { player1: "Λιακοπούλου", player2: "Χατζηδάκης", price: 7 },
             { player1: "Μπομπολάκης", player2: "Ρούσογλου", price: 7 },
+            { player1: "Ράμος", player2: "Καβαλάκης", price: 7 },
             { player1: "Κωστόπουλος", player2: "Στεφανόπουλος", price: 6 },
             { player1: "Παπακωνσταντίνου", player2: "Βλοχαιτόπουλος", price: 6 },
             { player1: "Γεμίδης1", player2: "Γεμίδης2", price: 5 },
@@ -116,43 +113,34 @@
             { player1: "Γεμίδης11", player2: "Γεμίδης12", price: 4 },
             { player1: "Γεμίδης13", player2: "Γεμίδης14", price: 4 },
             { player1: "Γεμίδης15", player2: "Γεμίδης16", price: 4 },
-            { player1: "Γεμίδης17", player2: "Γεμίδης18", price: 4 },
-            { player1: "Γεμίδης19", player2: "Γεμίδης20", price: 4 },
-            { player1: "Καραπετάκου", player2: "Βολιώτης", price: 4 },
+            { player1: "Σιδηρόπουλος", player2: "Καπράκης", price: 4 },
+            { player1: "Μαγκαφίνη", player2: "Κουλούσης", price: 4 },
             { player1: "Πετράκη", player2: "Ζερβογιάννης", price: 4 }
         ];
-        
-        const grid = document.getElementById("playerGrid");
-        const budgetEl = document.getElementById("budget");
-        const picksEl = document.getElementById("picks");
-        
-        pairs.forEach((pair, index) => {
-            const cell = document.createElement("div");
-            cell.classList.add("player");
-            cell.innerHTML = `${pair.player1} & ${pair.player2} <br> Price: ${pair.price}cr`;
-            cell.dataset.index = index;
-            grid.appendChild(cell);
-        });
 
-        grid.addEventListener("click", (e) => {
-            if (!e.target.classList.contains("player")) return;
-            const index = e.target.dataset.index;
-            const pair = pairs[index];
-            
-            if (e.target.classList.contains("selected")) {
-                e.target.classList.remove("selected");
+        function updateBudgetUI() {
+            const minPrice = Math.min(...pairs.map(p => p.price));
+            const remainingPicks = maxPicks - picks;
+            const requiredBudget = remainingPicks * minPrice;
+            warningEl.style.display = budget < requiredBudget ? "block" : "none";
+            updatePairAvailability(minPrice, remainingPicks);
+        }
+
+        function toggleSelection(cell, pair) {
+            if (cell.classList.contains("selected")) {
+                cell.classList.remove("selected");
                 budget += pair.price;
                 picks--;
             } else {
                 if (budget < pair.price || picks >= maxPicks) return;
-                e.target.classList.add("selected");
+                cell.classList.add("selected");
                 budget -= pair.price;
                 picks++;
             }
-
             budgetEl.textContent = budget;
             picksEl.textContent = picks;
-        });
+            updateBudgetUI();
+        }
 
         function resetSelection() {
             document.querySelectorAll(".player").forEach(cell => cell.classList.remove("selected"));
@@ -160,7 +148,46 @@
             picks = 0;
             budgetEl.textContent = budget;
             picksEl.textContent = picks;
+            updateBudgetUI();
         }
+
+        function updatePairAvailability(minPrice, remainingPicks) {
+            let enabledPairs = [];
+            let disabledPairs = [];
+
+            document.querySelectorAll(".player").forEach(cell => {
+                const price = parseInt(cell.dataset.price);
+                const affordableThreshold = budget - (remainingPicks - 1) * minPrice;
+                if ((warningEl.style.display === "block" || price > affordableThreshold) && !cell.classList.contains("selected")) {
+                    cell.classList.add("disabled");
+                    disabledPairs.push(cell);
+                } else {
+                    cell.classList.remove("disabled");
+                    enabledPairs.push(cell);
+                }
+            });
+
+            enabledPairs.sort((a, b) => parseInt(b.dataset.price) - parseInt(a.dataset.price));
+            grid.innerHTML = "";
+            [...enabledPairs, ...disabledPairs].forEach(cell => grid.appendChild(cell));
+        }
+
+        function populateGrid() {
+            grid.innerHTML = "";
+            pairs.forEach((pair, index) => {
+                const cell = document.createElement("div");
+                cell.classList.add("player");
+                cell.innerHTML = `${pair.player1} & ${pair.player2} <br> Price: ${pair.price}cr`;
+                cell.dataset.index = index;
+                cell.dataset.price = pair.price;
+                cell.addEventListener("click", () => toggleSelection(cell, pair));
+                grid.appendChild(cell);
+            });
+            updatePairAvailability(Math.min(...pairs.map(p => p.price)), maxPicks);
+        }
+
+        populateGrid();
+        updateBudgetUI();
     </script>
 </body>
 </html>
