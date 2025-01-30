@@ -177,7 +177,7 @@
             pairs.forEach((pair, index) => {
                 const cell = document.createElement("div");
                 cell.classList.add("player");
-                cell.innerHTML = `${pair.player1} & ${pair.player2} <br> Price: ${pair.price}cr`;
+                cell.innerHTML = `${pair.player1} - ${pair.player2} <br> Price: ${pair.price}cr`;
                 cell.dataset.index = index;
                 cell.dataset.price = pair.price;
                 cell.addEventListener("click", () => toggleSelection(cell, pair));
