@@ -157,7 +157,7 @@ function populateGrid() {
     pairs.forEach((pair, index) => {
         const cell = document.createElement("div");
         cell.classList.add("player");
-        cell.innerHTML = `<strong>${pair.player1} - ${pair.player2}</strong><br> Price: ${pair.price}cr`;
+        cell.innerHTML = `<strong>${pair.player1}<br>${pair.player2}</strong><br> Price: ${pair.price}cr`;
         cell.dataset.index = index;
         cell.dataset.price = pair.price;
 
@@ -182,11 +182,11 @@ function toggleDarkMode() {
     if (isDarkMode) {
         localStorage.setItem("darkMode", "enabled");
         document.getElementById("dark-mode-style").setAttribute("href", "dark-mode.css");
-        darkModeToggle.innerText = "LIGHT";
+        darkModeToggle.innerText = "";
     } else {
         localStorage.setItem("darkMode", "disabled");
         document.getElementById("dark-mode-style").setAttribute("href", "");
-        darkModeToggle.innerText = "DARK";
+        darkModeToggle.innerText = "";
     }
 }
 
@@ -194,9 +194,9 @@ function checkDarkMode() {
     if (localStorage.getItem("darkMode") === "enabled") {
         document.body.classList.add("dark-mode");
         document.getElementById("dark-mode-style").setAttribute("href", "dark-mode.css");
-        darkModeToggle.innerText = "LIGHT";
+        darkModeToggle.innerText = "";
     } else {
-        darkModeToggle.innerText = "DARK";
+        darkModeToggle.innerText = "";
     }
 }
 

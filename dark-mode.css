@@ -20,12 +20,6 @@ body {
     border-color: #555 !important;
 }
 
-/* Hover effect in dark mode */
-.player:hover {
-    background-color: #444 !important;
-    color: #ddd !important;
-}
-
 /* Selected players remain visible in dark mode */
 .selected {
     background-color: #388E3C !important;
@@ -53,10 +47,6 @@ button:hover {
     background-color: #555;
 }
 
-#darkModeToggle {
-    background-color: #888;
-    color: white;
-}
 
 #darkModeToggle:hover {
     background-color: #bbb;
@@ -76,8 +66,4 @@ button:hover {
     border-radius: 5px;
     cursor: pointer;
     margin-bottom: 10px;
-}
-
-#resetButton:hover {
-    background-color: #ff7300;
 }
