@@ -1,0 +1,134 @@
+/* styles.css */
+body {
+    font-family: Arial, sans-serif;
+    text-align: center;
+    background-color: #f4f4f4;
+    padding: 20px;
+    color: black;
+}
+
+.container {
+    max-width: 90%;
+    margin: auto;
+    background: white;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+.grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+    gap: 10px;
+    margin: 20px 0;
+}
+
+/* styles.css and dark-mode.css */
+.player {
+    padding: 10px;
+    border: 2px solid #ddd;
+    border-radius: 8px;
+    cursor: pointer;
+    background-color: white;
+    transition: background-color 0.3s ease-in-out, color 0.3s ease-in-out;
+    font-weight: bold;
+    text-align: center;
+    font-size: clamp(12px, 2vw, 16px);
+    color: black;
+}
+
+.player:hover {
+    background-color: #d1ecf1;
+    color: black;
+}
+
+.selected {
+    background-color: #4CAF50;
+    color: white;
+    border-color: #388E3C;
+}
+
+/* Disabled players appear grayed out and at the bottom */
+.disabled {
+    background-color: #cccccc !important;
+    color: #666666 !important;
+    cursor: not-allowed;
+    border-color: #aaa;
+    opacity: 0.5;
+}
+
+
+button {
+    background-color: #007BFF;
+    color: white;
+    border: none;
+    padding: 10px 15px;
+    font-size: 16px;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s ease-in-out;
+}
+
+button:hover {
+    background-color: #0056b3;
+}
+
+/* styles.css and dark-mode.css */
+#submitButton {
+    display: none;
+    background-color: #28a745;
+    color: white;
+    border: none;
+    padding: 10px 15px;
+    font-size: 16px;
+    border-radius: 5px;
+    cursor: pointer;
+    margin-bottom: 10px;
+}
+
+
+#submitButton:hover {
+    background-color: #218838;
+}
+
+/* Dark mode toggle next to picks count */
+#darkModeToggle {
+    background-color: #007BFF;
+    color: white;
+    border: none;
+    padding: 5px 10px;
+    font-size: 14px;
+    border-radius: 5px;
+    cursor: pointer;
+    margin-left: 10px;
+}
+
+#darkModeToggle:hover {
+    background-color: #0056b3;
+}
+
+/* Dark mode adjustments */
+.dark-mode #darkModeToggle {
+    background-color: #FFA500;
+    color: black;
+}
+
+.dark-mode #darkModeToggle:hover {
+    background-color: #ff7300;
+}
+
+/* styles.css and dark-mode.css */
+#resetButton {
+    background-color: #007BFF;
+    color: white;
+    border: none;
+    padding: 10px 15px;
+    font-size: 16px;
+    border-radius: 5px;
+    cursor: pointer;
+    margin-bottom: 10px;
+}
+
+#resetButton:hover {
+    background-color: #0056b3;
+}

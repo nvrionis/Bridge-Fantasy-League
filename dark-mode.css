@@ -1,0 +1,83 @@
+/* dark-mode.css */
+body {
+    background-color: #121212;
+    color: #ffffff;
+}
+
+.container {
+    background: #1e1e1e;
+    box-shadow: 0 0 10px rgba(255, 255, 255, 0.1);
+}
+
+.grid {
+    background: #252525;
+}
+
+/* Players should have a dark background */
+.player {
+    background-color: #333 !important;
+    color: white !important;
+    border-color: #555 !important;
+}
+
+/* Hover effect in dark mode */
+.player:hover {
+    background-color: #444 !important;
+    color: #ddd !important;
+}
+
+/* Selected players remain visible in dark mode */
+.selected {
+    background-color: #388E3C !important;
+    color: white !important;
+    border-color: #2e7d32 !important;
+}
+
+/* Disabled players now appear darker */
+.disabled {
+    background-color: #444 !important;
+    color: #777 !important;
+    cursor: not-allowed;
+    border-color: #666 !important;
+    opacity: 0.6;
+}
+
+/* Buttons should also be dark */
+button {
+    background-color: #444;
+    color: white;
+    border: 1px solid #666;
+}
+
+button:hover {
+    background-color: #555;
+}
+
+#darkModeToggle {
+    background-color: #888;
+    color: white;
+}
+
+#darkModeToggle:hover {
+    background-color: #bbb;
+}
+
+.warning {
+    color: #ff4c4c;
+}
+
+/* styles.css and dark-mode.css */
+#resetButton {
+    background-color: #FFA500;
+    color: black;
+    border: none;
+    padding: 10px 15px;
+    font-size: 16px;
+    border-radius: 5px;
+    cursor: pointer;
+    margin-bottom: 10px;
+}
+
+#resetButton:hover {
+    background-color: #ff7300;
+}
