@@ -12,48 +12,23 @@ const grid = document.getElementById("playerGrid");
 const submitBtn = document.getElementById("submitButton");
 const darkModeToggle = document.getElementById("darkModeToggle");
 
-const pairs = [
-    { player1: "Βρούστης", player2: "Δελημπαλταδάκης", price: 15 },
-    { player1: "Δοξιάδης", player2: "Ρούσσος", price: 14 },
-    { player1: "Παπακυριακόπουλος", player2: "Φίλιος", price: 14 },
-    { player1: "Καναβός", player2: "Ζώτος", price: 13 },
-    { player1: "Παπαγιάννης", player2: "Μπανίκας", price: 13 },
-    { player1: "Σαπουνάκης", player2: "Πρωτονοτάριος", price: 12 },
-    { player1: "Καραμανλής", player2: "Κουκουσέλης", price: 12 },
-    { player1: "Μπόζεμπερκ", player2: "Διονυσόπουλος", price: 12 },
-    { player1: "Αγγελόπουλος", player2: "Μπαλόκας", price: 11 },
-    { player1: "Ματζιάρης", player2: "Κοντομήτρος", price: 11 },
-    { player1: "Οικονομόπουλος", player2: "Αθανασιάδης", price: 11 },
-    { player1: "Λέφας", player2: "Μαρκάκης", price: 10 },
-    { player1: "Ταγαράς", player2: "Σταυρινός", price: 10 },
-    { player1: "Δογάνη", player2: "Παπασπύρου", price: 9 },
-    { player1: "Καπαγιαννίδη", player2: "Κανελοπούλου", price: 9 },
-    { player1: "Κονιδιάρης", player2: "Τσέβης", price: 9 },
-    { player1: "Σιδέρης", player2: "Κάσσανδρος", price: 9 },
-    { player1: "Σούμπλης", player2: "Καπίρης", price: 9 },
-    { player1: "Βελαΐτη", player2: "Παπαχατζής", price: 8 },
-    { player1: "Πανόπουλος", player2: "Λαγγουράνης", price: 8 },
-    { player1: "Παπαπέτρος", player2: "Μωυσίδης", price: 8 },
-    { player1: "Κάτσαρης", player2: "Σοφιός", price: 7 },
-    { player1: "Λιακοπούλου", player2: "Χατζηδάκης", price: 7 },
-    { player1: "Μπομπολάκης", player2: "Ρούσογλου", price: 7 },
-    { player1: "Ράμος", player2: "Καβαλάκης", price: 7 },
-    { player1: "Κωστόπουλος", player2: "Στεφανόπουλος", price: 6 },
-    { player1: "Παπακωνσταντίνου", player2: "Βλοχαιτόπουλος", price: 6 },
-    { player1: "Γεμίδης1", player2: "Γεμίδης2", price: 5 },
-    { player1: "Γεμίδης3", player2: "Γεμίδης4", price: 5 },
-    { player1: "Γεμίδης5", player2: "Γεμίδης6", price: 5 },
-    { player1: "Γεμίδης7", player2: "Γεμίδης8", price: 5 },
-    { player1: "Γεμίδης9", player2: "Γεμίδης10", price: 5 },
-    { player1: "Θεοδωρίδης", player2: "Παπαματθαίου", price: 5 },
-    { player1: "Κασιμοπούλου", player2: "Καρατζά", price: 5 },
-    { player1: "Γεμίδης11", player2: "Γεμίδης12", price: 4 },
-    { player1: "Γεμίδης13", player2: "Γεμίδης14", price: 4 },
-    { player1: "Γεμίδης15", player2: "Γεμίδης16", price: 4 },
-    { player1: "Σιδηρόπουλος", player2: "Καπράκης", price: 4 },
-    { player1: "Μαγκαφίνη", player2: "Κουλούσης", price: 4 },
-    { player1: "Πετράκη", player2: "Ζερβογιάννης", price: 4 }
-];
+let pairs = []; // Empty array, will be filled with JSON data
+
+// Fetch the pairs.json file and populate the grid dynamically
+function loadPairs() {
+    fetch("pairs.json")
+        .then(response => response.json())
+        .then(data => {
+            pairs = data; // Store loaded data in the pairs variable
+            populateGrid(); // Populate grid with loaded pairs
+            updateBudgetUI(); // Update UI after loading data
+        })
+        .catch(error => console.error("Error loading pairs:", error));
+}
+
+// Call the function to load pairs when the page loads
+document.addEventListener("DOMContentLoaded", loadPairs);
+
 
 function updateBudgetUI() {
     const minPrice = Math.min(...pairs.map(p => p.price));
@@ -77,10 +52,14 @@ function toggleSelection(cell, pair) {
         budget -= pair.price;
         picks++;
     }
+
     budgetEl.textContent = budget;
     picksEl.textContent = picks;
-    updateBudgetUI();
+    
+    updatePairAvailability(); // Update disabled pairs dynamically
 }
+
+
 
 function resetSelection() {
     document.querySelectorAll(".player").forEach(cell => cell.classList.remove("selected"));
@@ -91,25 +70,46 @@ function resetSelection() {
     updateBudgetUI();
 }
 
-function updatePairAvailability(minPrice, remainingPicks) {
-    let enabledPairs = [];
+function sortPairs(selected, available, disabled) {
+    // Sort each category by price (most to least expensive)
+    selected.sort((a, b) => b.dataset.price - a.dataset.price);
+    available.sort((a, b) => b.dataset.price - a.dataset.price);
+    disabled.sort((a, b) => b.dataset.price - a.dataset.price);
+
+    // Clear and repopulate the grid
+    grid.innerHTML = "";
+    [...selected, ...available, ...disabled].forEach(cell => grid.appendChild(cell));
+}
+
+
+function updatePairAvailability() {
+    let selectedPairs = [];
+    let availablePairs = [];
     let disabledPairs = [];
+
+    const minPrice = Math.min(...pairs.map(p => p.price)); // Find the lowest price
+    const remainingPicks = maxPicks - picks; // Remaining selections allowed
+    const threshold = budget - (minPrice * (remainingPicks - 1)); // Adjusted budget threshold
 
     document.querySelectorAll(".player").forEach(cell => {
         const price = parseInt(cell.dataset.price);
-        const affordableThreshold = budget - (remainingPicks - 1) * minPrice;
-        if ((warningEl.style.display === "block" || price > affordableThreshold) && !cell.classList.contains("selected")) {
+
+        if (cell.classList.contains("selected")) {
+            selectedPairs.push(cell); // Already selected, keep it in selected list
+        } else if (price > threshold) { 
+            // If price exceeds what we can afford while keeping budget for other picks
             cell.classList.add("disabled");
             disabledPairs.push(cell);
         } else {
             cell.classList.remove("disabled");
-            enabledPairs.push(cell);
+            availablePairs.push(cell);
         }
     });
 
-    grid.innerHTML = "";
-    [...enabledPairs, ...disabledPairs].forEach(cell => grid.appendChild(cell));
+    sortPairs(selectedPairs, availablePairs, disabledPairs);
 }
+
+
 
 function toggleSubmitButton() {
     if (picks === maxPicks) {
@@ -151,8 +151,6 @@ function submitSelection() {
 
 function populateGrid() {
     grid.innerHTML = "";
-    let enabledPairs = [];
-    let disabledPairs = [];
 
     pairs.forEach((pair, index) => {
         const cell = document.createElement("div");
@@ -161,20 +159,11 @@ function populateGrid() {
         cell.dataset.index = index;
         cell.dataset.price = pair.price;
 
-        const price = pair.price;
-        if (budget < price) {
-            cell.classList.add("disabled");
-            disabledPairs.push(cell);
-        } else {
-            enabledPairs.push(cell);
-        }
-
         cell.addEventListener("click", () => toggleSelection(cell, pair));
+        grid.appendChild(cell);
     });
 
-    [...enabledPairs, ...disabledPairs].forEach(cell => grid.appendChild(cell));
-
-    updatePairAvailability(Math.min(...pairs.map(p => p.price)), maxPicks);
+    updatePairAvailability(); // Apply the updated sorting and disabling logic
 }
 
 function toggleDarkMode() {
