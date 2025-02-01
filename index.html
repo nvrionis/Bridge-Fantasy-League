@@ -1,30 +1,30 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Bridge Pair Selection</title>
-    <link rel="stylesheet" href="styles.css">
-    <link id="dark-mode-style" rel="stylesheet" href="">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Bridge Pair Selection</title>
+  <link rel="stylesheet" href="styles.css" />
+  <link id="dark-mode-style" rel="stylesheet" href="" />
 </head>
 <body>
-    <div class="header">
-        <h1>Pick Your Bridge Pairs</h1>
-        <div class="status-bar">
-            <span>Budget: <span id="budget">48</span> credits</span> 
-            <span>Picks: <span id="picks">0</span>/5</span> 
-            <span id="darkModeToggle" onclick="toggleDarkMode()"></span>
-        </div>
-        <button id="submitButton" onclick="submitSelection()" style="display: none;">Submit</button>
-        <button id="resetButton" onclick="resetSelection()">Reset</button>
-        <button id="resetButton" onclick="logoutSelection()">Logout</button>
-        <p id="warning" class="warning" style="color: red; font-weight: bold; display: none;">
-            Warning: Not enough credits to get 5 picks!
-        </p>
+  <div class="header">
+    <h1>Pick Your Bridge Pairs</h1>
+    <div class="status-bar">
+      <span>Budget: <span id="budget">48</span> credits</span>
+      <span>Picks: <span id="picks">0</span>/5</span>
+      <span id="darkModeToggle" onclick="toggleDarkMode()"></span>
     </div>
-    <div class="container content">
-        <div class="grid" id="playerGrid"></div>
-    </div>
-    <script src="script.js"></script>
+    <button id="submitButton" onclick="submitSelection()" style="display: none;">Submit</button>
+    <button id="resetButton" onclick="resetSelection()">Reset</button>
+    <button id="logoutButton" onclick="logoutSelection()">Logout</button>
+    <p id="warning" class="warning" style="display: none;">
+      Warning: Not enough credits to get 5 picks!
+    </p>
+  </div>
+  <div class="container content">
+    <div class="grid" id="playerGrid"></div>
+  </div>
+  <script src="script.js"></script>
 </body>
 </html>

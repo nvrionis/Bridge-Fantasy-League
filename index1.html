@@ -1,0 +1,1340 @@
+
+
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bridge Pair Selection</title>
+	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/meyer-reset/2.0/reset.min.css">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            background-color: #f4f4f4;
+            padding: 20px;
+        }
+        .container {
+            max-width: 90%;
+            margin: auto;
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 10px;
+            margin: 20px 0;
+        }
+        .player {
+            padding: 10px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            cursor: pointer;
+            background-color: white;
+            transition: background-color 0.3s ease-in-out, color 0.3s ease-in-out;
+            font-weight: bold;
+            text-align: center;
+            font-size: clamp(12px, 2vw, 16px);
+            color: black;
+        }
+        .player:hover {
+            background-color: #d1ecf1;
+            color: black;
+        }
+        .selected {
+            background-color: #4CAF50;
+            color: white;
+            border-color: #388E3C;
+        }
+        .disabled:not(.selected) {
+            background-color: #ccc !important;
+            color: #666 !important;
+            cursor: not-allowed;
+            border-color: #aaa;
+        }
+		
+	
+
+
+
+@import url("https://fonts.googleapis.com/css2?family=Spline+Sans:wght@300;400;500;600;700&display=swap");
+*,
+*:after,
+*:before {
+  box-sizing: border-box;
+}
+
+:root {
+  --c-white: #fff;
+  --c-black: #000;
+  --c-ash: #eaeef6;
+  --c-charcoal: #a0a0a0;
+  --c-void: #141b22;
+  --c-fair-pink: #FFEDEC;
+  --c-apricot: #FBC8BE;
+  --c-coffee: #754D42;
+  --c-del-rio: #917072;
+  --c-java: #1FCAC5;
+  --c-titan-white: #f1eeff;
+  --c-cold-purple: #a69fd6;
+  --c-indigo: #6558d3;
+  --c-governor: #4133B7;
+}	
+		
+		body {
+  font-family: "Spline Sans", sans-serif;
+  min-height: 100vh;
+  background-color: var(--c-ash);
+}
+		
+		
+		.cards {
+		  display: flex;
+		  flex-wrap: wrap;
+		  align-items: flex-start;
+		  flex-wrap: wrap;
+		  justify-content: center;
+		  gap: 1rem;
+		  width: 90%;
+		  margin: 1vh auto;
+		}
+
+		.card {
+		  border-radius: 16px;
+		  box-shadow: 0 30px 30px -25px rgba(65, 51, 183, 0.25);
+		  max-width: 300px;
+		}
+
+
+		.details {
+		  display: flex;
+		  gap: 1rem;
+		}
+		.details div {
+		  padding: 0.75em 1em;
+		  background-color: var(--c-titan-white);
+		  border-radius: 8px;
+		  display: flex;
+		  flex-direction: column-reverse;
+		  gap: 0.125em;
+		  flex-basis: 50%;
+		}
+		.details dt {
+		  font-size: 0.675rem;
+		  color: var(--c-cold-purple);
+		}
+		.details dd {
+		  color: var(--c-indigo);
+		  font-weight: 600;
+		  font-size: 1rem;
+		}
+
+		.plan {
+		  padding: 10px;
+		  
+		  color: var(--c-del-rio);
+		}
+		.plan strong {
+		  font-weight: 600;
+		  color: var(--c-coffee);
+		}
+		.plan .inner {
+		  padding: 10px;
+		  padding-top: 30px;
+		  background-color: linen;
+		  border-radius: 12px;
+		  position: relative;
+		  overflow: hidden;
+		}
+		.plan .pricing {
+		  position: absolute;
+		  top: 0;
+		  right: 0;
+		  background-color: var(--c-apricot);
+		  border-radius: 99em 0 0 99em;
+		  display: flex;
+		  align-items: center;
+		  padding: 0.3125em 0.375em;
+		  font-size: 1.25rem;
+		  font-weight: 600;
+		  color: var(--c-coffee);
+		}
+		.plan .pricing small {
+		  color: var(--c-del-rio);
+		  font-size: 0.75em;
+		  margin-left: 0.25em;
+		}
+		.plan .title {
+		  font-weight: 600;
+		  font-size: 1.25rem;
+		  color: var(--c-coffee);
+		}
+		.plan .title + * {
+		  margin-top: 0.75rem;
+		}
+		.plan .info + * {
+		  margin-top: 1rem;
+		}
+		.plan .features {
+		  display: flex;
+		  flex-direction: column;
+		}
+		.plan .features li {
+		  display: flex;
+		  align-items: center;
+		  gap: 0.5rem;
+		}
+		.plan .features li + * {
+		  margin-top: 0.75rem;
+		}
+		.plan .features .icon {
+		  background-color: var(--c-java);
+		  display: inline-flex;
+		  align-items: center;
+		  justify-content: center;
+		  color: var(--c-white);
+		  border-radius: 50%;
+		  width: 20px;
+		  height: 20px;
+		}
+		.plan .features .icon svg {
+		  width: 14px;
+		  height: 14px;
+		}
+		.plan .features + * {
+		  margin-top: 1.25rem;
+		}
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>Pick Your Bridge Pairs</h1>
+        <p>Budget: <span id="budget">48</span> credits | Picks: <span id="picks">0</span>/5</p>
+        <p id="warning" class="warning" style="color: red; font-weight: bold; display: none;">Warning: Not enough credits to get 5 picks!</p>
+    </div>
+    <div class="container content">
+		<form method="post" id='squad'>
+			<div class="cards" id="playerGrid">
+								<article class="plan [ card ] player" data-index="1" data-price="15">
+					<div class="inner">
+
+						<span class="pricing">
+							<span>
+								15 <small> CR</small>
+							</span>
+						</span>
+						<h2 class="title">
+						Βρούστης<br/>
+						Δελημπαλταδάκης						</h2>
+						
+						<dl class="details">
+							<div>
+								<dt>Προκριματικός</dt>
+								<dd>OAMKH</dd>
+							</div>
+							<div>
+								<dt>Ποσοστό</dt>
+								<dd>53.34%</dd>
+							</div>
+						</dl>
+					</div>
+				</article>
+								<article class="plan [ card ] player" data-index="3" data-price="14">
+					<div class="inner">
+
+						<span class="pricing">
+							<span>
+								14 <small> CR</small>
+							</span>
+						</span>
+						<h2 class="title">
+						Παπακυριακόπουλος<br/>
+						Φίλιος						</h2>
+						
+						<dl class="details">
+							<div>
+								<dt>Προκριματικός</dt>
+								<dd>ΟΑΜΠΕΙ</dd>
+							</div>
+							<div>
+								<dt>Ποσοστό</dt>
+								<dd>53.40%</dd>
+							</div>
+						</dl>
+					</div>
+				</article>
+								<article class="plan [ card ] player" data-index="2" data-price="14">
+					<div class="inner">
+
+						<span class="pricing">
+							<span>
+								14 <small> CR</small>
+							</span>
+						</span>
+						<h2 class="title">
+						Ρούσσος<br/>
+						Δοξιάδης						</h2>
+						
+						<dl class="details">
+							<div>
+								<dt>Προκριματικός</dt>
+								<dd>OAMKH</dd>
+							</div>
+							<div>
+								<dt>Ποσοστό</dt>
+								<dd>53.54%</dd>
+							</div>
+						</dl>
+					</div>
+				</article>
+								<article class="plan [ card ] player" data-index="4" data-price="13">
+					<div class="inner">
+
+						<span class="pricing">
+							<span>
+								13 <small> CR</small>
+							</span>
+						</span>
+						<h2 class="title">
+						Ζώτος<br/>
+						Κανναβός						</h2>
+						
+						<dl class="details">
+							<div>
+								<dt>Προκριματικός</dt>
+								<dd>ΟΑΜΠΕΙ</dd>
+							</div>
+							<div>
+								<dt>Ποσοστό</dt>
+								<dd>50.00%</dd>
+							</div>
+						</dl>
+					</div>
+				</article>
+								<article class="plan [ card ] player" data-index="5" data-price="13">
+					<div class="inner">
+
+						<span class="pricing">
+							<span>
+								13 <small> CR</small>
+							</span>
+						</span>
+						<h2 class="title">
+						Παπαγιάννης<br/>
+						Μπανίκας						</h2>
+						
+						<dl class="details">
+							<div>
+								<dt>Προκριματικός</dt>
+								<dd>OAMKH</dd>
+							</div>
+							<div>
+								<dt>Ποσοστό</dt>
+								<dd>54.38%</dd>
+							</div>
+						</dl>
+					</div>
+				</article>
+								<article class="plan [ card ] player" data-index="7" data-price="12">
+					<div class="inner">
+
+						<span class="pricing">
+							<span>
+								12 <small> CR</small>
+							</span>
+						</span>
+						<h2 class="title">
+						Καραμανλής<br/>
+						Κουκουσέλης						</h2>
+						
+						<dl class="details">
+							<div>
+								<dt>Προκριματικός</dt>
+								<dd>OAMKH</dd>
+							</div>
+							<div>
+								<dt>Ποσοστό</dt>
+								<dd>52.34%</dd>
+							</div>
+						</dl>
+					</div>
+				</article>
+								<article class="plan [ card ] player" data-index="6" data-price="12">
+					<div class="inner">
+
+						<span class="pricing">
+							<span>
+								12 <small> CR</small>
+							</span>
+						</span>
+						<h2 class="title">
+						Μπόζεμπεργκ<br/>
+						Διονυσόπουλος						</h2>
+						
+						<dl class="details">
+							<div>
+								<dt>Προκριματικός</dt>
+								<dd>OAMKH</dd>
+							</div>
+							<div>
+								<dt>Ποσοστό</dt>
+								<dd>54.49%</dd>
+							</div>
+						</dl>
+					</div>
+				</article>
+								<article class="plan [ card ] player" data-index="10" data-price="12">
+					<div class="inner">
+
+						<span class="pricing">
+							<span>
+								12 <small> CR</small>
+							</span>
+						</span>
+						<h2 class="title">
+						Σαπουνάκης<br/>
+						Πρωτονοτάριος						</h2>
+						
+						<dl class="details">
+							<div>
+								<dt>Προκριματικός</dt>
+								<dd>OAMKH</dd>
+							</div>
+							<div>
+								<dt>Ποσοστό</dt>
+								<dd>56.78%</dd>
+							</div>
+						</dl>
+					</div>
+				</article>
+								<article class="plan [ card ] player" data-index="8" data-price="11">
+					<div class="inner">
+
+						<span class="pricing">
+							<span>
+								11 <small> CR</small>
+							</span>
+						</span>
+						<h2 class="title">
+						Αγγελόπουλος<br/>
+						Μπαλόκας						</h2>
+						
+						<dl class="details">
+							<div>
+								<dt>Προκριματικός</dt>
+								<dd>ΟΑΜΘ</dd>
+							</div>
+							<div>
+								<dt>Ποσοστό</dt>
+								<dd>55.09%</dd>
+							</div>
+						</dl>
+					</div>
+				</article>
+								<article class="plan [ card ] player" data-index="11" data-price="11">
+					<div class="inner">
+
+						<span class="pricing">
+							<span>
+								11 <small> CR</small>
+							</span>
+						</span>
+						<h2 class="title">
+						Ματζιάρης<br/>
+						Κοντομήτρος						</h2>
+						
+						<dl class="details">
+							<div>
+								<dt>Προκριματικός</dt>
+								<dd>OAMKH</dd>
+							</div>
+							<div>
+								<dt>Ποσοστό</dt>
+								<dd>54.53%</dd>
+							</div>
+						</dl>
+					</div>
+				</article>
+								<article class="plan [ card ] player" data-index="9" data-price="11">
+					<div class="inner">
+
+						<span class="pricing">
+							<span>
+								11 <small> CR</small>
+							</span>
+						</span>
+						<h2 class="title">
+						Οικονομόπουλος<br/>
+						Αθανασιάδης						</h2>
+						
+						<dl class="details">
+							<div>
+								<dt>Προκριματικός</dt>
+								<dd>ΟΑΜΘ</dd>
+							</div>
+							<div>
+								<dt>Ποσοστό</dt>
+								<dd>52.01%</dd>
+							</div>
+						</dl>
+					</div>
+				</article>
+								<article class="plan [ card ] player" data-index="13" data-price="10">
+					<div class="inner">
+
+						<span class="pricing">
+							<span>
+								10 <small> CR</small>
+							</span>
+						</span>
+						<h2 class="title">
+						Λέφας<br/>
+						Μαρκάκης						</h2>
+						
+						<dl class="details">
+							<div>
+								<dt>Προκριματικός</dt>
+								<dd>ΟΑΜΘ</dd>
+							</div>
+							<div>
+								<dt>Ποσοστό</dt>
+								<dd>56.02%</dd>
+							</div>
+						</dl>
+					</div>
+				</article>
+								<article class="plan [ card ] player" data-index="12" data-price="10">
+					<div class="inner">
+
+						<span class="pricing">
+							<span>
+								10 <small> CR</small>
+							</span>
+						</span>
+						<h2 class="title">
+						Ταγαράς<br/>
+						Σταυρινός						</h2>
+						
+						<dl class="details">
+							<div>
+								<dt>Προκριματικός</dt>
+								<dd>ΟΑΜΘ</dd>
+							</div>
+							<div>
+								<dt>Ποσοστό</dt>
+								<dd>54.01%</dd>
+							</div>
+						</dl>
+					</div>
+				</article>
+								<article class="plan [ card ] player" data-index="15" data-price="9">
+					<div class="inner">
+
+						<span class="pricing">
+							<span>
+								9 <small> CR</small>
+							</span>
+						</span>
+						<h2 class="title">
+						Δογάνη<br/>
+						Παπασπύρου						</h2>
+						
+						<dl class="details">
+							<div>
+								<dt>Προκριματικός</dt>
+								<dd>OAMKH</dd>
+							</div>
+							<div>
+								<dt>Ποσοστό</dt>
+								<dd>59.84%</dd>
+							</div>
+						</dl>
+					</div>
+				</article>
+								<article class="plan [ card ] player" data-index="17" data-price="9">
+					<div class="inner">
+
+						<span class="pricing">
+							<span>
+								9 <small> CR</small>
+							</span>
+						</span>
+						<h2 class="title">
+						Καπαγιαννίδη<br/>
+						Κανελλοπούλου						</h2>
+						
+						<dl class="details">
+							<div>
+								<dt>Προκριματικός</dt>
+								<dd>OAMKH</dd>
+							</div>
+							<div>
+								<dt>Ποσοστό</dt>
+								<dd>53.45%</dd>
+							</div>
+						</dl>
+					</div>
+				</article>
+								<article class="plan [ card ] player" data-index="18" data-price="9">
+					<div class="inner">
+
+						<span class="pricing">
+							<span>
+								9 <small> CR</small>
+							</span>
+						</span>
+						<h2 class="title">
+						Κονιδάρης<br/>
+						Τσέβης						</h2>
+						
+						<dl class="details">
+							<div>
+								<dt>Προκριματικός</dt>
+								<dd>OAMKH</dd>
+							</div>
+							<div>
+								<dt>Ποσοστό</dt>
+								<dd>53.75%</dd>
+							</div>
+						</dl>
+					</div>
+				</article>
+								<article class="plan [ card ] player" data-index="14" data-price="9">
+					<div class="inner">
+
+						<span class="pricing">
+							<span>
+								9 <small> CR</small>
+							</span>
+						</span>
+						<h2 class="title">
+						Σιδέρης<br/>
+						Κάσσανδρος						</h2>
+						
+						<dl class="details">
+							<div>
+								<dt>Προκριματικός</dt>
+								<dd>ΟΑΜΠΕΙ</dd>
+							</div>
+							<div>
+								<dt>Ποσοστό</dt>
+								<dd>55.56%</dd>
+							</div>
+						</dl>
+					</div>
+				</article>
+								<article class="plan [ card ] player" data-index="16" data-price="9">
+					<div class="inner">
+
+						<span class="pricing">
+							<span>
+								9 <small> CR</small>
+							</span>
+						</span>
+						<h2 class="title">
+						Σουμπλής<br/>
+						Καπίρης						</h2>
+						
+						<dl class="details">
+							<div>
+								<dt>Προκριματικός</dt>
+								<dd>OAMKH</dd>
+							</div>
+							<div>
+								<dt>Ποσοστό</dt>
+								<dd>56.86%</dd>
+							</div>
+						</dl>
+					</div>
+				</article>
+								<article class="plan [ card ] player" data-index="20" data-price="8">
+					<div class="inner">
+
+						<span class="pricing">
+							<span>
+								8 <small> CR</small>
+							</span>
+						</span>
+						<h2 class="title">
+						Βελαΐτη<br/>
+						Παπαχατζής						</h2>
+						
+						<dl class="details">
+							<div>
+								<dt>Προκριματικός</dt>
+								<dd>OAMKH</dd>
+							</div>
+							<div>
+								<dt>Ποσοστό</dt>
+								<dd>57.86%</dd>
+							</div>
+						</dl>
+					</div>
+				</article>
+								<article class="plan [ card ] player" data-index="21" data-price="8">
+					<div class="inner">
+
+						<span class="pricing">
+							<span>
+								8 <small> CR</small>
+							</span>
+						</span>
+						<h2 class="title">
+						Πανόπουλος<br/>
+						Λαγγουράνης						</h2>
+						
+						<dl class="details">
+							<div>
+								<dt>Προκριματικός</dt>
+								<dd>OAMKH</dd>
+							</div>
+							<div>
+								<dt>Ποσοστό</dt>
+								<dd>53.24%</dd>
+							</div>
+						</dl>
+					</div>
+				</article>
+								<article class="plan [ card ] player" data-index="19" data-price="8">
+					<div class="inner">
+
+						<span class="pricing">
+							<span>
+								8 <small> CR</small>
+							</span>
+						</span>
+						<h2 class="title">
+						Παπαπέτρος<br/>
+						Μωυσίδης						</h2>
+						
+						<dl class="details">
+							<div>
+								<dt>Προκριματικός</dt>
+								<dd>OAMKH</dd>
+							</div>
+							<div>
+								<dt>Ποσοστό</dt>
+								<dd>51.69%</dd>
+							</div>
+						</dl>
+					</div>
+				</article>
+								<article class="plan [ card ] player" data-index="22" data-price="7">
+					<div class="inner">
+
+						<span class="pricing">
+							<span>
+								7 <small> CR</small>
+							</span>
+						</span>
+						<h2 class="title">
+						Κάτσαρης<br/>
+						Σοφιός						</h2>
+						
+						<dl class="details">
+							<div>
+								<dt>Προκριματικός</dt>
+								<dd>ΟΑΜΠΕΙ</dd>
+							</div>
+							<div>
+								<dt>Ποσοστό</dt>
+								<dd>51.08%</dd>
+							</div>
+						</dl>
+					</div>
+				</article>
+								<article class="plan [ card ] player" data-index="23" data-price="7">
+					<div class="inner">
+
+						<span class="pricing">
+							<span>
+								7 <small> CR</small>
+							</span>
+						</span>
+						<h2 class="title">
+						Λιακοπούλου<br/>
+						Χατζηδάκης						</h2>
+						
+						<dl class="details">
+							<div>
+								<dt>Προκριματικός</dt>
+								<dd>ΟΑΜΠΕΙ</dd>
+							</div>
+							<div>
+								<dt>Ποσοστό</dt>
+								<dd>50.62%</dd>
+							</div>
+						</dl>
+					</div>
+				</article>
+								<article class="plan [ card ] player" data-index="24" data-price="7">
+					<div class="inner">
+
+						<span class="pricing">
+							<span>
+								7 <small> CR</small>
+							</span>
+						</span>
+						<h2 class="title">
+						Μπομπολάκης<br/>
+						Ρούσογλου						</h2>
+						
+						<dl class="details">
+							<div>
+								<dt>Προκριματικός</dt>
+								<dd>OAMKH</dd>
+							</div>
+							<div>
+								<dt>Ποσοστό</dt>
+								<dd>51.32%</dd>
+							</div>
+						</dl>
+					</div>
+				</article>
+								<article class="plan [ card ] player" data-index="31" data-price="7">
+					<div class="inner">
+
+						<span class="pricing">
+							<span>
+								7 <small> CR</small>
+							</span>
+						</span>
+						<h2 class="title">
+						Ράμος<br/>
+						Καβαλάκης						</h2>
+						
+						<dl class="details">
+							<div>
+								<dt>Προκριματικός</dt>
+								<dd>ΟΑΜΡ</dd>
+							</div>
+							<div>
+								<dt>Ποσοστό</dt>
+								<dd>59.62%</dd>
+							</div>
+						</dl>
+					</div>
+				</article>
+								<article class="plan [ card ] player" data-index="26" data-price="6">
+					<div class="inner">
+
+						<span class="pricing">
+							<span>
+								6 <small> CR</small>
+							</span>
+						</span>
+						<h2 class="title">
+						Κωστόπουλος<br/>
+						Στεφανόπουλος						</h2>
+						
+						<dl class="details">
+							<div>
+								<dt>Προκριματικός</dt>
+								<dd>OAMKH</dd>
+							</div>
+							<div>
+								<dt>Ποσοστό</dt>
+								<dd>52.58%</dd>
+							</div>
+						</dl>
+					</div>
+				</article>
+								<article class="plan [ card ] player" data-index="25" data-price="6">
+					<div class="inner">
+
+						<span class="pricing">
+							<span>
+								6 <small> CR</small>
+							</span>
+						</span>
+						<h2 class="title">
+						Παπακωνσταντίνου<br/>
+						Βλοχαϊτόπουλος						</h2>
+						
+						<dl class="details">
+							<div>
+								<dt>Προκριματικός</dt>
+								<dd>OAMKH</dd>
+							</div>
+							<div>
+								<dt>Ποσοστό</dt>
+								<dd>51.93%</dd>
+							</div>
+						</dl>
+					</div>
+				</article>
+								<article class="plan [ card ] player" data-index="32" data-price="5">
+					<div class="inner">
+
+						<span class="pricing">
+							<span>
+								5 <small> CR</small>
+							</span>
+						</span>
+						<h2 class="title">
+						Γεμίδης 1<br/>
+						Γεμίδης 2						</h2>
+						
+						<dl class="details">
+							<div>
+								<dt>Προκριματικός</dt>
+								<dd></dd>
+							</div>
+							<div>
+								<dt>Ποσοστό</dt>
+								<dd>0.00%</dd>
+							</div>
+						</dl>
+					</div>
+				</article>
+								<article class="plan [ card ] player" data-index="33" data-price="5">
+					<div class="inner">
+
+						<span class="pricing">
+							<span>
+								5 <small> CR</small>
+							</span>
+						</span>
+						<h2 class="title">
+						Γεμίδης 3<br/>
+						Γεμίδης 4						</h2>
+						
+						<dl class="details">
+							<div>
+								<dt>Προκριματικός</dt>
+								<dd></dd>
+							</div>
+							<div>
+								<dt>Ποσοστό</dt>
+								<dd>0.00%</dd>
+							</div>
+						</dl>
+					</div>
+				</article>
+								<article class="plan [ card ] player" data-index="28" data-price="5">
+					<div class="inner">
+
+						<span class="pricing">
+							<span>
+								5 <small> CR</small>
+							</span>
+						</span>
+						<h2 class="title">
+						Θεοδωρίδης<br/>
+						Παπαματθαίου						</h2>
+						
+						<dl class="details">
+							<div>
+								<dt>Προκριματικός</dt>
+								<dd>ΟΑΜΘ</dd>
+							</div>
+							<div>
+								<dt>Ποσοστό</dt>
+								<dd>52.31%</dd>
+							</div>
+						</dl>
+					</div>
+				</article>
+								<article class="plan [ card ] player" data-index="27" data-price="5">
+					<div class="inner">
+
+						<span class="pricing">
+							<span>
+								5 <small> CR</small>
+							</span>
+						</span>
+						<h2 class="title">
+						Κασιμοπούλου<br/>
+						Καρατζά						</h2>
+						
+						<dl class="details">
+							<div>
+								<dt>Προκριματικός</dt>
+								<dd>OAMKH</dd>
+							</div>
+							<div>
+								<dt>Ποσοστό</dt>
+								<dd>51.22%</dd>
+							</div>
+						</dl>
+					</div>
+				</article>
+								<article class="plan [ card ] player" data-index="39" data-price="4">
+					<div class="inner">
+
+						<span class="pricing">
+							<span>
+								4 <small> CR</small>
+							</span>
+						</span>
+						<h2 class="title">
+						Γεμίδης 11<br/>
+						Γεμίδης 12						</h2>
+						
+						<dl class="details">
+							<div>
+								<dt>Προκριματικός</dt>
+								<dd></dd>
+							</div>
+							<div>
+								<dt>Ποσοστό</dt>
+								<dd>0.00%</dd>
+							</div>
+						</dl>
+					</div>
+				</article>
+								<article class="plan [ card ] player" data-index="40" data-price="4">
+					<div class="inner">
+
+						<span class="pricing">
+							<span>
+								4 <small> CR</small>
+							</span>
+						</span>
+						<h2 class="title">
+						Γεμίδης 13<br/>
+						Γεμίδης 14						</h2>
+						
+						<dl class="details">
+							<div>
+								<dt>Προκριματικός</dt>
+								<dd></dd>
+							</div>
+							<div>
+								<dt>Ποσοστό</dt>
+								<dd>0.00%</dd>
+							</div>
+						</dl>
+					</div>
+				</article>
+								<article class="plan [ card ] player" data-index="36" data-price="4">
+					<div class="inner">
+
+						<span class="pricing">
+							<span>
+								4 <small> CR</small>
+							</span>
+						</span>
+						<h2 class="title">
+						Γεμίδης 5<br/>
+						Γεμίδης 6						</h2>
+						
+						<dl class="details">
+							<div>
+								<dt>Προκριματικός</dt>
+								<dd></dd>
+							</div>
+							<div>
+								<dt>Ποσοστό</dt>
+								<dd>0.00%</dd>
+							</div>
+						</dl>
+					</div>
+				</article>
+								<article class="plan [ card ] player" data-index="37" data-price="4">
+					<div class="inner">
+
+						<span class="pricing">
+							<span>
+								4 <small> CR</small>
+							</span>
+						</span>
+						<h2 class="title">
+						Γεμίδης 7<br/>
+						Γεμίδης 8						</h2>
+						
+						<dl class="details">
+							<div>
+								<dt>Προκριματικός</dt>
+								<dd></dd>
+							</div>
+							<div>
+								<dt>Ποσοστό</dt>
+								<dd>0.00%</dd>
+							</div>
+						</dl>
+					</div>
+				</article>
+								<article class="plan [ card ] player" data-index="38" data-price="4">
+					<div class="inner">
+
+						<span class="pricing">
+							<span>
+								4 <small> CR</small>
+							</span>
+						</span>
+						<h2 class="title">
+						Γεμίδης 9<br/>
+						Γεμίδης 10						</h2>
+						
+						<dl class="details">
+							<div>
+								<dt>Προκριματικός</dt>
+								<dd></dd>
+							</div>
+							<div>
+								<dt>Ποσοστό</dt>
+								<dd>0.00%</dd>
+							</div>
+						</dl>
+					</div>
+				</article>
+								<article class="plan [ card ] player" data-index="35" data-price="4">
+					<div class="inner">
+
+						<span class="pricing">
+							<span>
+								4 <small> CR</small>
+							</span>
+						</span>
+						<h2 class="title">
+						Καραπετάκου<br/>
+						Βολιώτης						</h2>
+						
+						<dl class="details">
+							<div>
+								<dt>Προκριματικός</dt>
+								<dd>OAMKH</dd>
+							</div>
+							<div>
+								<dt>Ποσοστό</dt>
+								<dd>51.90%</dd>
+							</div>
+						</dl>
+					</div>
+				</article>
+								<article class="plan [ card ] player" data-index="30" data-price="4">
+					<div class="inner">
+
+						<span class="pricing">
+							<span>
+								4 <small> CR</small>
+							</span>
+						</span>
+						<h2 class="title">
+						Μαγκαφίνη<br/>
+						Κουλούσης						</h2>
+						
+						<dl class="details">
+							<div>
+								<dt>Προκριματικός</dt>
+								<dd>Αστέρας</dd>
+							</div>
+							<div>
+								<dt>Ποσοστό</dt>
+								<dd>47.86%</dd>
+							</div>
+						</dl>
+					</div>
+				</article>
+								<article class="plan [ card ] player" data-index="34" data-price="4">
+					<div class="inner">
+
+						<span class="pricing">
+							<span>
+								4 <small> CR</small>
+							</span>
+						</span>
+						<h2 class="title">
+						Πετράκη<br/>
+						Ζερβογιάννης						</h2>
+						
+						<dl class="details">
+							<div>
+								<dt>Προκριματικός</dt>
+								<dd>OAMKH</dd>
+							</div>
+							<div>
+								<dt>Ποσοστό</dt>
+								<dd>51.90%</dd>
+							</div>
+						</dl>
+					</div>
+				</article>
+								<article class="plan [ card ] player" data-index="29" data-price="4">
+					<div class="inner">
+
+						<span class="pricing">
+							<span>
+								4 <small> CR</small>
+							</span>
+						</span>
+						<h2 class="title">
+						Σιδηρόπουλος<br/>
+						Καπράκης						</h2>
+						
+						<dl class="details">
+							<div>
+								<dt>Προκριματικός</dt>
+								<dd>Αστέρας</dd>
+							</div>
+							<div>
+								<dt>Ποσοστό</dt>
+								<dd>51.67%</dd>
+							</div>
+						</dl>
+					</div>
+				</article>
+							</div>
+			
+			<input type="hidden" name="user_id" value="2">
+			<input type="submit" value="Submit">
+		</form>
+        <button onclick="resetSelection()">Reset</button>
+    </div>
+    <script>
+        const budgetLimit = 48;
+        let budget = 48;
+        let picks = 0;
+        const maxPicks = 5;
+
+        const budgetEl = document.getElementById("budget");
+        const picksEl = document.getElementById("picks");
+        const warningEl = document.getElementById("warning");
+        const grid = document.getElementById("playerGrid");
+		const pairs = Array.from(document.querySelectorAll(".player"));
+
+
+        function updateBudgetUI() {
+            const minPrice = Math.min(...pairs.map(p => p.getAttribute("data-price")));
+			console.log("minPrice="+minPrice);
+            const remainingPicks = maxPicks - picks;
+            const requiredBudget = remainingPicks * minPrice;
+            warningEl.style.display = budget < requiredBudget ? "block" : "none";
+            updatePairAvailability(minPrice, remainingPicks);
+        }
+
+        function toggleSelection(cell, pair) {
+            if (cell.classList.contains("selected")) {
+                cell.classList.remove("selected");
+                budget += Number(pair.price);
+                picks--;
+            } else {
+                if (budget < pair.price || picks >= maxPicks) return;
+                cell.classList.add("selected");
+                budget -= pair.price;
+                picks++;
+            }
+            budgetEl.textContent = budget;
+            picksEl.textContent = picks;
+            updateBudgetUI();
+        }
+
+        function resetSelection() {
+            document.querySelectorAll(".player").forEach(cell => cell.classList.remove("selected"));
+            budget = budgetLimit;
+            picks = 0;
+            budgetEl.textContent = budget;
+            picksEl.textContent = picks;
+            updateBudgetUI();
+        }
+
+        function updatePairAvailability(minPrice, remainingPicks) {
+            let enabledPairs = [];
+            let disabledPairs = [];
+
+            document.querySelectorAll(".player").forEach(cell => {
+                const price = parseInt(cell.dataset.price);
+                const affordableThreshold = budget - (remainingPicks - 1) * minPrice;
+                if ((warningEl.style.display === "block" || price > affordableThreshold) && !cell.classList.contains("selected")) {
+                    cell.classList.add("disabled");
+                    disabledPairs.push(cell);
+                } else {
+                    cell.classList.remove("disabled");
+                    enabledPairs.push(cell);
+                }
+            });
+
+            enabledPairs.sort((a, b) => parseInt(b.dataset.price) - parseInt(a.dataset.price));
+            grid.innerHTML = "";
+            [...enabledPairs, ...disabledPairs].forEach(cell => grid.appendChild(cell));
+        }
+
+        function populateGrid() {
+
+            updatePairAvailability(Math.min(...pairs.map(p => p.price)), maxPicks);
+        }
+
+        updateBudgetUI();
+    </script>
+	
+	
+	
+	
+	<a href="logout.php">Logout</a>
+	
+	<script>
+		document.addEventListener("DOMContentLoaded", () => {
+		document.querySelectorAll(".player").forEach((cell) => {
+			cell.addEventListener("click", () => {
+				toggleSelection(cell, {
+					index: cell.dataset.index,
+					price: cell.dataset.price
+				});
+			});
+		});
+	});
+	
+	
+	document.querySelector("form").addEventListener("submit", function(event) {
+		let budgetLimit = 48; // Set your budget limit
+		let maxPicks = 5; // Set max allowed selections
+
+		let selectedPlayers = document.querySelectorAll(".player.selected");
+
+		// Collect indices and sum up prices
+		let selectedIndices = [];
+		let totalPrice = 0;
+
+		selectedPlayers.forEach(player => {
+			let price = parseFloat(player.getAttribute("data-price"));
+			let index = player.getAttribute("data-index");
+
+			selectedIndices.push(index);
+			totalPrice += price;
+		});
+
+		// Validate budget and max picks
+		if (selectedIndices.length != maxPicks) {
+			alert(`Πρέπει να επιλέξεις ακριβώς ${maxPicks} παίκτες.`);
+			event.preventDefault(); // Stop form submission
+			return;
+		}
+
+		if (totalPrice > budgetLimit) {
+			alert(`Δεν μπορείς να χρησιμοποιήσεις παραπάνω από ${budgetLimit} CR.`);
+			event.preventDefault(); // Stop form submission
+			return;
+		}
+
+		// Ensure hidden input exists (avoid duplicates)
+		let inputField = document.getElementById("selectedPlayersInput");
+		if (!inputField) {
+			inputField = document.createElement("input");
+			inputField.type = "hidden";
+			inputField.name = "selectedPlayers[]";
+			inputField.id = "selectedPlayersInput";
+			event.target.appendChild(inputField);
+		}
+
+		// Store selected player indices as a comma-separated string
+		inputField.value = selectedIndices.join(",");
+
+		// If all conditions are met, the form submits normally
+	});
+
+	</script>
+</body>
+</html>
+
+
+
+	
+
+    
+
+		
+	
+

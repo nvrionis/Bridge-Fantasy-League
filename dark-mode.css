@@ -1,69 +1,50 @@
 /* dark-mode.css */
-body {
-    background-color: #121212;
-    color: #ffffff;
-}
-
-.container {
-    background: #1e1e1e;
-    box-shadow: 0 0 10px rgba(255, 255, 255, 0.1);
-}
-
-.grid {
-    background: #252525;
-}
-
-/* Players should have a dark background */
-.player {
-    background-color: #333 !important;
-    color: white !important;
-    border-color: #555 !important;
-}
-
-/* Selected players remain visible in dark mode */
-.selected {
-    background-color: #388E3C !important;
-    color: white !important;
-    border-color: #2e7d32 !important;
-}
-
-/* Disabled players now appear darker */
-.disabled {
-    background-color: #444 !important;
-    color: #777 !important;
-    cursor: not-allowed;
-    border-color: #666 !important;
-    opacity: 0.6;
-}
-
-/* Buttons should also be dark */
-button {
-    background-color: #444;
-    color: white;
-    border: 1px solid #666;
-}
-
-button:hover {
-    background-color: #555;
-}
-
-
-#darkModeToggle:hover {
-    background-color: #bbb;
-}
-
-.warning {
-    color: #ff4c4c;
-}
-
-/* styles.css and dark-mode.css */
-#resetButton {
-    background-color: #FFA500;
-    color: black;
-    border: none;
-    padding: 10px 15px;
-    font-size: 16px;
-    border-radius: 5px;
-    cursor: pointer;
-    margin-bottom: 10px;
-}
+:root {
+    /* Modern Dark Theme Colors */
+    --bg-color: #121212;         /* Deep dark background */
+    --text-color: #E0E0E0;         /* Light grey text */
+    --card-bg: #1E1E1E;            /* Dark card background */
+    --card-border: #7a7878;        /* Dark grey border */
+    --card-shadow: rgba(0, 0, 0, 0.3);  /* Slightly stronger shadow */
+    --selected-bg: #52be56;      /* Modern green for selection */
+    --selected-border: #0a400c;  /* Slightly darker green border */
+    --price-bg: #90CAF9;           /* Soft, modern blue for price tag */
+    --price-text: #121212;         /* Dark text for contrast on the price tag */
+    --button-bg: #2979FF;          /* Dark grey for buttons */
+    --button-text: #E0E0E0;         /* Light text on buttons */
+    --reset-bg: white;             /* Reset/logout buttons: white background */
+    --reset-text: black;           /* ... with black text */
+  }
+  
+  body {
+    background-color: var(--bg-color);
+    color: var(--text-color);
+    transition: background-color 0.3s ease, color 0.3s ease;
+  }
+  
+  .container {
+    background: var(--card-bg);
+    box-shadow: 0 4px 12px var(--card-shadow);
+  }
+  
+  .pair {
+    border-color: var(--card-border);
+    box-shadow: 0 3px 6px var(--card-shadow);
+  }
+  
+  #darkModeToggle::before {
+    content: '\2600'; /* Sun symbol for dark mode */
+    color: #FFC107;
+  }
+  
+  button {
+    background-color: var(--button-bg);
+    color: var(--button-text);
+  }
+  
+  #resetButton,
+  #logoutButton {
+    background-color: var(--reset-bg);
+    color: var(--reset-text);
+  }
+  
