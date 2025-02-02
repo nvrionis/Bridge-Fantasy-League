@@ -68,3 +68,10 @@
   .modal-close {
     color: #333333 !important;
   }
+
+  /* Dark Mode Override for Suit Icon */
+.suit-icon {
+    background-color: transparent; /* A mid-tone background */
+    color: white;
+  }
+  

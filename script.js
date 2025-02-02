@@ -15,29 +15,147 @@ const grid = document.getElementById("playerGrid");
 const submitBtn = document.getElementById("submitButton");
 const darkModeToggle = document.getElementById("darkModeToggle");
 
-// Load pairs from the JSON file
 function loadPairs() {
-  fetch("pairs.json")
-    .then((response) => response.json())
-    .then((data) => {
-      pairs = data;
-      populateGrid();
-      updateBudgetUI();
-    })
-    .catch((error) => console.error("Error loading pairs:", error));
-}
+    fetch("pairs.json")
+      .then((response) => response.json())
+      .then((data) => {
+        pairs = data;
+        assignExpectedRankRanges(); // Compute expected rank ranges per price group.
+        populateGrid();
+        updateBudgetUI();
+      })
+      .catch((error) => console.error("Error loading pairs:", error));
+  }
+  
 
 document.addEventListener("DOMContentLoaded", loadPairs);
 
+// Returns a suit emoji based on the pair's price
+function getSuitIcon(price) {
+    let icon;
+    if (price >= 13) {
+      icon = "♠";  // Spades for highest-priced pairs
+    } else if (price >= 10) {
+      icon = "♥";  // Hearts for slightly lower-priced pairs
+    } else if (price >= 7) {
+      icon = "♦";  // Diamonds for mid-priced pairs
+    } else {
+      icon = "♣";  // Clubs for the lowest-priced pairs
+    }
+    console.log("Price:", price, "Icon:", icon);
+    return icon;
+  }
+  
+// Compute the median of an array of numbers
+function median(arr) {
+    const sorted = arr.slice().sort((a, b) => a - b);
+    const mid = Math.floor(sorted.length / 2);
+    if (sorted.length % 2 === 0) {
+      return (sorted[mid - 1] + sorted[mid]) / 2;
+    } else {
+      return sorted[mid];
+    }
+  }
+  
+// Compute expected rank ranges for each pair based on price groups.
+// For each unique price (sorted descending), assign a range [minExpected, maxExpected]
+// where, for example, if one pair has price 15 then its expected range is [1,1],
+// if two pairs have price 14 then the expected range is [2,3], etc.
+function assignExpectedRankRanges() {
+    // Create a copy of pairs sorted by price descending.
+    let sortedPairs = [...pairs].sort((a, b) => b.price - a.price);
+  
+    // Group pairs by price.
+    const groups = {};
+    sortedPairs.forEach(pair => {
+      const price = pair.price;
+      if (!groups[price]) {
+        groups[price] = [];
+      }
+      groups[price].push(pair);
+    });
+  
+    // Process groups in descending order of price.
+    const sortedPrices = Object.keys(groups).sort((a, b) => b - a);
+    let currentRank = 1;
+    sortedPrices.forEach(price => {
+      let group = groups[price];
+      const count = group.length;
+      // The expected range for this group is from currentRank to currentRank + count - 1.
+      const minExpected = currentRank;
+      const maxExpected = currentRank + count - 1;
+      group.forEach(pair => {
+        pair.expectedMin = minExpected;
+        pair.expectedMax = maxExpected;
+      });
+      currentRank += count;
+    });
+  }
+  
+  
+
+// Returns the color for the rank based on actual vs expected
+function getRankColor(actual, expectedMin, expectedMax) {
+    const actualRank = parseInt(actual, 10);
+    const minExpected = parseInt(expectedMin, 10);
+    const maxExpected = parseInt(expectedMax, 10);
+    if (isNaN(actualRank) || isNaN(minExpected) || isNaN(maxExpected)) return "#333333";
+    if (actualRank < minExpected) {
+      return "green";
+    } else if (actualRank > maxExpected) {
+      return "red";
+    } else {
+      return "orange";
+    }
+  }
+  
+
+function updateBudgetColor() {
+    // Calculate the minimum price from the pairs array
+    const minPrice = Math.min(...pairs.map(p => p.price));
+    // Determine how many picks remain
+    const remainingPicks = maxPicks - picks;
+    // Calculate the value left for the next pick, assuming you reserve enough for the other picks
+    const availableValue = budget - ((remainingPicks - 1) * minPrice);
+    
+    // Set the color based on availableValue tiers:
+    //   > 12: (Tier 1) – default (or you could choose a specific color)
+    // 10–12: (Tier 2) – green
+    // 7–9:  (Tier 3) – orange
+    //  < 7:  (Tier 4) – red
+    if (availableValue > 12) {
+      // Here you might choose to keep it default or pick a color.
+      // For example, using your light mode text color:
+      budgetEl.style.color = "#208bc9"; 
+    } else if (availableValue >= 10 && availableValue <= 12) {
+      budgetEl.style.color = "#1cad4f";
+    } else if (availableValue >= 7 && availableValue <= 9) {
+      budgetEl.style.color = "#c28825";
+    } else { // availableValue < 7
+      budgetEl.style.color = "#cf3d11";
+    }
+  }
+  
 // Update UI for budget, warning and pair availability
 function updateBudgetUI() {
-  const minPrice = Math.min(...pairs.map((p) => p.price));
-  const remainingPicks = maxPicks - picks;
-  const requiredBudget = remainingPicks * minPrice;
-  warningEl.style.display = budget < requiredBudget ? "block" : "none";
-  updatePairAvailability();
-  toggleSubmitButton();
-}
+    // Calculate the minimum price for reference
+    const minPrice = Math.min(...pairs.map(p => p.price));
+    const remainingPicks = maxPicks - picks;
+    const requiredBudget = remainingPicks * minPrice;
+    
+    // Show warning if needed
+    warningEl.style.display = budget < requiredBudget ? "block" : "none";
+    
+    // Update pair availability (and then sort grid, etc.)
+    updatePairAvailability();
+    
+    // Update the submit button visibility
+    toggleSubmitButton();
+    
+    // Update the budget element's color based on available funds for the next pick
+    updateBudgetColor();
+  }
+  
 
 // Toggle selection of a pair card
 function toggleSelection(cell, pair) {
@@ -63,6 +181,9 @@ function toggleSelection(cell, pair) {
     
     // Update the submit button visibility
     toggleSubmitButton();
+    
+    // **Update the budget color after every selection change**
+    updateBudgetColor();
   }
   
 
@@ -122,7 +243,6 @@ function toggleSubmitButton() {
   submitBtn.style.display = picks === maxPicks ? "inline-block" : "none";
 }
 
-// Submit the selection after confirming the user’s name
 // Submit the selection when exactly 5 pairs are picked
 function submitSelection() {
     // Ensure that exactly 5 pairs are selected
@@ -166,7 +286,6 @@ function submitSelection() {
     // Optionally, reset selections after submission
     resetSelection();
   }
-  
 
 // New function to show additional information using a modal
 function showPairInfo(pair) {
@@ -216,13 +335,28 @@ function showPairInfo(pair) {
       cell.dataset.index = index;
       cell.dataset.price = pair.price;
   
-      // Show the shorter name first
+      // Choose which name to show first (shorter one first)
       const name1 = pair.player1;
       const name2 = pair.player2;
       const [firstName, secondName] =
         name1.length <= name2.length ? [name1, name2] : [name2, name1];
   
+      // Determine the ranking HTML.
+      // If pair.rank is set (and not "placeholder") then use it.
+      let rankHTML = "";
+      if (pair.rank && pair.rank !== "placeholder") {
+        // Use the expectedMin and expectedMax computed earlier.
+        const rankColor = getRankColor(pair.rank, pair.expectedMin, pair.expectedMax);
+        rankHTML = `<div class="ranking-tag" style="background-color: ${rankColor}; color: white;">
+                      ${pair.rank}
+                    </div>`;
+      } else {
+        // Optionally, display an empty ranking circle.
+        rankHTML = `<div class="ranking-tag"></div>`;
+      }
+  
       cell.innerHTML = `
+        <div class="suit-icon">${getSuitIcon(pair.price)}</div>
         <div class="pair-info">
           <div class="pair-names">
             <strong>${firstName}</strong><br>
@@ -231,6 +365,7 @@ function showPairInfo(pair) {
         </div>
         <div class="price-tag">${pair.price}cr</div>
         <div class="info-icon">i</div>
+        ${rankHTML}
       `;
   
       // When clicking the pair card, toggle selection (if not disabled)
@@ -239,7 +374,6 @@ function showPairInfo(pair) {
       // Attach event listener to the info icon
       const infoIcon = cell.querySelector(".info-icon");
       infoIcon.addEventListener("click", (event) => {
-        // Prevent the click on the info icon from toggling the selection
         event.stopPropagation();
         showPairInfo(pair);
       });
