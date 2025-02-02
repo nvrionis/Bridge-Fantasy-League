@@ -41,23 +41,30 @@ function updateBudgetUI() {
 
 // Toggle selection of a pair card
 function toggleSelection(cell, pair) {
-  if (cell.classList.contains("disabled")) return;
-
-  if (cell.classList.contains("selected")) {
-    cell.classList.remove("selected");
-    budget += pair.price;
-    picks--;
-  } else {
-    if (budget < pair.price || picks >= maxPicks) return;
-    cell.classList.add("selected");
-    budget -= pair.price;
-    picks++;
+    if (cell.classList.contains("disabled")) return;
+  
+    if (cell.classList.contains("selected")) {
+      cell.classList.remove("selected");
+      budget += pair.price;
+      picks--;
+    } else {
+      if (budget < pair.price || picks >= maxPicks) return;
+      cell.classList.add("selected");
+      budget -= pair.price;
+      picks++;
+    }
+  
+    // Update the displayed budget and picks
+    budgetEl.textContent = budget;
+    picksEl.textContent = picks;
+    
+    // Update the state of available pairs
+    updatePairAvailability();
+    
+    // Update the submit button visibility
+    toggleSubmitButton();
   }
-
-  budgetEl.textContent = budget;
-  picksEl.textContent = picks;
-  updatePairAvailability();
-}
+  
 
 // Reset all selections
 function resetSelection() {
@@ -116,66 +123,133 @@ function toggleSubmitButton() {
 }
 
 // Submit the selection after confirming the user’s name
+// Submit the selection when exactly 5 pairs are picked
 function submitSelection() {
-  let selectedPairs = [];
-  document.querySelectorAll(".pair.selected").forEach((cell) => {
-    // Use the first line (pair names) as the identifier
-    selectedPairs.push(cell.innerText.split("\n")[0]);
-  });
-
-  if (selectedPairs.length === maxPicks) {
-    let userName = prompt(
-      `You have selected:\n\n${selectedPairs.join("\n")}\n\nEnter your name to confirm:`
-    );
-
-    if (!userName || userName.trim() === "") {
-      alert("Submission canceled. Please enter your name.");
+    // Ensure that exactly 5 pairs are selected
+    if (picks !== maxPicks) {
+      alert("Please select exactly 5 pairs before submitting.");
       return;
     }
-
+    
+    // Get the current timestamp in ISO format
+    const timestamp = new Date().toISOString();
+  
+    // Collect selected pairs (using the first line of the cell's innerText as the pair identifier)
+    const selectedPairs = [];
+    document.querySelectorAll(".pair.selected").forEach((cell) => {
+      selectedPairs.push(cell.innerText.split("\n")[0]);
+    });
+    
+    // Build the submission data object
     const submissionData = {
-      name: userName.trim(),
-      picks: selectedPairs,
+      timestamp: timestamp,
+      picks: selectedPairs
     };
-
-    console.log("Ready to send to backend:", submissionData);
-    alert(`Thank you, ${userName}! Your selection has been recorded.`);
-    // Future implementation: Send submissionData to the backend
+  
+    // TODO: Implement database submission logic here.
+    // For example, you might send submissionData to your backend using fetch:
+    //
+    // fetch('/submit', {
+    //   method: 'POST',
+    //   headers: { 'Content-Type': 'application/json' },
+    //   body: JSON.stringify(submissionData)
+    // })
+    // .then(response => response.json())
+    // .then(data => console.log('Submission successful:', data))
+    // .catch(error => console.error('Submission error:', error));
+    
+    console.log("Submitting data to the database:", submissionData);
+  
+    // Temporary confirmation message
+    alert("Your selection has been submitted!");
+  
+    // Optionally, reset selections after submission
+    resetSelection();
   }
-}
+  
 
-// Dynamically populate the grid with pairs from pairs.json
-function populateGrid() {
-  grid.innerHTML = "";
-
-  pairs.forEach((pair, index) => {
-    const cell = document.createElement("div");
-    cell.classList.add("pair");
-    cell.dataset.index = index;
-    cell.dataset.price = pair.price;
-
-    // Show the shorter name first
-    const name1 = pair.player1;
-    const name2 = pair.player2;
-    const [firstName, secondName] = name1.length <= name2.length
-      ? [name1, name2]
-      : [name2, name1];
-
-    cell.innerHTML = `
-      <div class="pair-info">
-        <div class="pair-names">
-          <strong>${firstName}</strong><br>
-          <strong>${secondName}</strong>
-        </div>
-      </div>
-      <div class="price-tag">${pair.price}cr</div>
-    `;
-    cell.addEventListener("click", () => toggleSelection(cell, pair));
-    grid.appendChild(cell);
+// New function to show additional information using a modal
+function showPairInfo(pair) {
+    const modal = document.getElementById("infoModal");
+    const modalContent = document.getElementById("modalContent");
+  
+    // Build the content HTML
+    let infoHTML = `<p><strong>Προκριματικός:</strong> ${pair.prokrimatikos_club}</p>
+                    <p><strong>Ποσοστό προκριματικών:</strong> ${pair.prokrimatikos_pososto}</p>`;
+  
+    // Only include the day percentages if they are more than 0
+    if (parseFloat(pair.day_1) > 0) {
+      infoHTML += `<p><strong>Ποσοστό 1ης μέρας:</strong> ${pair.day_1}</p>`;
+    }
+    if (parseFloat(pair.day_2) > 0) {
+      infoHTML += `<p><strong>Ποσοστό 2ης μέρας:</strong> ${pair.day_2}</p>`;
+    }
+    if (parseFloat(pair.day_3) > 0) {
+      infoHTML += `<p><strong>Ποσοστό 3ης μέρας:</strong> ${pair.day_3}</p>`;
+    }
+  
+    modalContent.innerHTML = infoHTML;
+    modal.style.display = "flex";
+  }
+  
+  // Close modal function
+  function closeModal() {
+    const modal = document.getElementById("infoModal");
+    modal.style.display = "none";
+  }
+  
+  // Attach event listeners for closing the modal
+  document.getElementById("modalClose").addEventListener("click", closeModal);
+  document.getElementById("infoModal").addEventListener("click", (event) => {
+    if (event.target.id === "infoModal") {
+      closeModal();
+    }
   });
-
-  updatePairAvailability();
-}
+  
+  // Update the populateGrid function to include the info icon (see previous changes)
+  function populateGrid() {
+    grid.innerHTML = "";
+  
+    pairs.forEach((pair, index) => {
+      const cell = document.createElement("div");
+      cell.classList.add("pair");
+      cell.dataset.index = index;
+      cell.dataset.price = pair.price;
+  
+      // Show the shorter name first
+      const name1 = pair.player1;
+      const name2 = pair.player2;
+      const [firstName, secondName] =
+        name1.length <= name2.length ? [name1, name2] : [name2, name1];
+  
+      cell.innerHTML = `
+        <div class="pair-info">
+          <div class="pair-names">
+            <strong>${firstName}</strong><br>
+            <strong>${secondName}</strong>
+          </div>
+        </div>
+        <div class="price-tag">${pair.price}cr</div>
+        <div class="info-icon">i</div>
+      `;
+  
+      // When clicking the pair card, toggle selection (if not disabled)
+      cell.addEventListener("click", () => toggleSelection(cell, pair));
+  
+      // Attach event listener to the info icon
+      const infoIcon = cell.querySelector(".info-icon");
+      infoIcon.addEventListener("click", (event) => {
+        // Prevent the click on the info icon from toggling the selection
+        event.stopPropagation();
+        showPairInfo(pair);
+      });
+  
+      grid.appendChild(cell);
+    });
+  
+    updatePairAvailability();
+  }
+  
 
 // Dark Mode toggle functions
 function toggleDarkMode() {

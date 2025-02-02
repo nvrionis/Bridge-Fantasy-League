@@ -48,3 +48,23 @@
     color: var(--reset-text);
   }
   
+/* Dark Mode Modal Overrides for Clarity and Crispness */
+.modal-overlay {
+    background-color: rgba(0, 0, 0, 0.5) !important;
+  }
+  
+  /* Modal Container: force light mode styling */
+  .modal {
+    background-color: #ffffff !important;
+    color: #333333 !important;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15) !important;
+    border: 1px solid #e0e0e0 !important;
+    border-radius: 8px;
+    padding: 20px;
+    text-align: left;
+  }
+  
+  /* Modal Close Button: use the light mode text color */
+  .modal-close {
+    color: #333333 !important;
+  }
