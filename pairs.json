@@ -198,6 +198,17 @@
       "rank": "18"
     },
     {
+        "player1": "Σκορδάς",
+        "player2": "Δημητρακόπουλος",
+        "price": 9,
+        "prokrimatikos_club": "ΟΑΜΛ",
+        "prokrimatikos_pososto": "placeholder",
+        "day_1": "placeholder",
+        "day_2": "placeholder",
+        "day_3": "placeholder",
+        "rank": "19"
+      },
+    {
       "player1": "Βελαΐτη",
       "player2": "Παπαχατζής",
       "price": 8,
@@ -206,7 +217,7 @@
       "day_1": "placeholder",
       "day_2": "placeholder",
       "day_3": "placeholder",
-      "rank": "19"
+      "rank": "20"
     },
     {
       "player1": "Πανόπουλος",
@@ -217,7 +228,7 @@
       "day_1": "placeholder",
       "day_2": "placeholder",
       "day_3": "placeholder",
-      "rank": "20"
+      "rank": "21"
     },
     {
       "player1": "Παπαπέτρος",
@@ -228,7 +239,7 @@
       "day_1": "placeholder",
       "day_2": "placeholder",
       "day_3": "placeholder",
-      "rank": "21"
+      "rank": "22"
     },
     {
       "player1": "Κάτσαρης",
@@ -239,7 +250,7 @@
       "day_1": "placeholder",
       "day_2": "placeholder",
       "day_3": "placeholder",
-      "rank": "22"
+      "rank": "23"
     },
     {
       "player1": "Λιακοπούλου",
@@ -250,7 +261,7 @@
       "day_1": "placeholder",
       "day_2": "placeholder",
       "day_3": "placeholder",
-      "rank": "23"
+      "rank": "24"
     },
     {
       "player1": "Μπομπολάκης",
@@ -261,7 +272,7 @@
       "day_1": "placeholder",
       "day_2": "placeholder",
       "day_3": "placeholder",
-      "rank": "24"
+      "rank": "25"
     },
     {
       "player1": "Ράμος",
@@ -272,7 +283,18 @@
       "day_1": "placeholder",
       "day_2": "placeholder",
       "day_3": "placeholder",
-      "rank": "25"
+      "rank": "26"
+    },
+    {
+      "player1": "Κοτινάς",
+      "player2": "Μακρής",
+      "price": 7,
+      "prokrimatikos_club": "ΟΑΜΛ",
+      "prokrimatikos_pososto": "placeholder",
+      "day_1": "placeholder",
+      "day_2": "placeholder",
+      "day_3": "placeholder",
+      "rank": "27"
     },
     {
       "player1": "Κωστόπουλος",
@@ -283,34 +305,12 @@
       "day_1": "placeholder",
       "day_2": "placeholder",
       "day_3": "placeholder",
-      "rank": "26"
+      "rank": "28"
     },
     {
       "player1": "Παπακωνσταντίνου",
       "player2": "Βλοχαιτόπουλος",
       "price": 6,
-      "prokrimatikos_club": "placeholder",
-      "prokrimatikos_pososto": "placeholder",
-      "day_1": "placeholder",
-      "day_2": "placeholder",
-      "day_3": "placeholder",
-      "rank": "27"
-    },
-    {
-      "player1": "Γεμίδης1",
-      "player2": "Γεμίδης2",
-      "price": 5,
-      "prokrimatikos_club": "placeholder",
-      "prokrimatikos_pososto": "placeholder",
-      "day_1": "placeholder",
-      "day_2": "placeholder",
-      "day_3": "placeholder",
-      "rank": "28"
-    },
-    {
-      "player1": "Γεμίδης3",
-      "player2": "Γεμίδης4",
-      "price": 5,
       "prokrimatikos_club": "placeholder",
       "prokrimatikos_pososto": "placeholder",
       "day_1": "placeholder",
@@ -374,10 +374,10 @@
       "rank": "34"
     },
     {
-      "player1": "Γεμίδης11",
-      "player2": "Γεμίδης12",
+      "player1": "Μπεληγιάννη",
+      "player2": "Κούρτης",
       "price": 4,
-      "prokrimatikos_club": "placeholder",
+      "prokrimatikos_club": "ΟΑΜΑ",
       "prokrimatikos_pososto": "placeholder",
       "day_1": "placeholder",
       "day_2": "placeholder",
