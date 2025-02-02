@@ -189,13 +189,15 @@ function toggleSelection(cell, pair) {
 
 // Reset all selections
 function resetSelection() {
-  document.querySelectorAll(".pair").forEach((cell) => cell.classList.remove("selected"));
-  budget = budgetLimit;
-  picks = 0;
-  budgetEl.textContent = budget;
-  picksEl.textContent = picks;
-  updateBudgetUI();
+    document.querySelectorAll(".pair").forEach((cell) => cell.classList.remove("selected"));
+    budget = budgetLimit;
+    picks = 0;
+    budgetEl.textContent = budget;
+    picksEl.textContent = picks;
+    submitBtn.disabled = true; 
+    updateBudgetUI();
 }
+  
 
 // Dummy logout function (clears localStorage and reloads the page)
 function logoutSelection() {
@@ -240,8 +242,9 @@ function updatePairAvailability() {
 
 // Toggle the submit button based on the number of picks
 function toggleSubmitButton() {
-  submitBtn.style.display = picks === maxPicks ? "inline-block" : "none";
-}
+    submitBtn.disabled = picks < maxPicks;
+  }
+  
 
 // Submit the selection when exactly 5 pairs are picked
 function submitSelection() {
