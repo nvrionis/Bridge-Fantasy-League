@@ -8,38 +8,50 @@
   <link id="dark-mode-style" rel="stylesheet" href="" />
 </head>
 <body>
-  <div class="header">
-    <h1>Pick Your Bridge Pairs</h1>
-    <div class="status-bar">
-      <span>Budget: <span id="budget">48</span> credits</span>
-      <span>Picks: <span id="picks">0</span>/5</span>
-      <span id="darkModeToggle" onclick="toggleDarkMode()"></span>
+    <div class="header">
+        <h1>Pick Your Bridge Pairs</h1>
+        <button id="menuToggle" class="burger-menu" onclick="toggleMenu()">&#9776;</button>
     </div>
-    <!-- Buttons placed together -->
-    <div class="button-group">
-      <button id="resetButton" onclick="resetSelection()">Reset</button>
-      <button id="logoutButton" onclick="logoutSelection()">Logout</button>
-      <!-- Submit button is initially hidden; it appears when 5 picks are made -->
-      <button id="submitButton" onclick="submitSelection()" disabled>Submit</button>
+    
+    <!-- Side Menu (Hidden Initially) -->
+    <div id="sideMenu" class="side-menu">
+        <button class="close-menu" onclick="toggleMenu()">&times;</button>
+        <ul>
+            <li><a href="#" onclick="showInstructions()">📖 Instructions</a></li>
+            <li><a href="#" class="active">🎴 Picks (Current)</a></li>
+            <li><a href="#">🏆 Squads</a></li>
+            <li><button id="logoutButton" onclick="logoutSelection()">🚪 Logout</button></li>
+        </ul>
     </div>
-    <p id="warning" class="warning" style="display: none;">
-      Warning: Not enough credits to get 5 picks!
-    </p>
-  </div>
-  <div class="container content">
-    <div class="grid" id="playerGrid"></div>
-  </div>
-  
-  <!-- Modal for Pair Info -->
-  <div id="infoModal" class="modal-overlay" style="display: none;">
-    <div class="modal">
-      <button class="modal-close" id="modalClose">&times;</button>
-      <div class="modal-content" id="modalContent">
-        <!-- Info content will be inserted here -->
-      </div>
-    </div>
-  </div>
+        
 
-  <script src="script.js"></script>
+        <div class="button-group">
+            <button id="resetButton" onclick="resetSelection()">Reset</button>
+            <button id="logoutButton" onclick="logoutSelection()">Logout</button>
+            <button id="submitButton" onclick="submitSelection()" disabled>Submit</button>
+        </div>
+    </div>
+        
+    <div class="container content">
+        <div class="status-bar">
+            <span>Budget: <span id="budget">48</span> credits</span>
+            <span>Picks: <span id="picks">0</span>/5</span>
+            <span id="darkModeToggle" onclick="toggleDarkMode()"></span>
+        </div>    
+        <div class="grid" id="playerGrid"></div>
+    </div>
+    
+  
+    <!-- Modal for Pair Info -->
+    <div id="infoModal" class="modal-overlay" style="display: none;">
+        <div class="modal">
+        <button class="modal-close" id="modalClose">&times;</button>
+        <div class="modal-content" id="modalContent">
+            <!-- Info content will be inserted here -->
+        </div>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
 </body>
 </html>

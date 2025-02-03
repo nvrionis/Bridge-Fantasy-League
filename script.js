@@ -189,14 +189,19 @@ function toggleSelection(cell, pair) {
 
 // Reset all selections
 function resetSelection() {
-    document.querySelectorAll(".pair").forEach((cell) => cell.classList.remove("selected"));
+    document.querySelectorAll(".pair").forEach((cell) => {
+        cell.classList.remove("selected", "disabled"); // Ensure all pairs are re-enabled
+    });
+
     budget = budgetLimit;
     picks = 0;
     budgetEl.textContent = budget;
     picksEl.textContent = picks;
-    submitBtn.disabled = true; 
-    updateBudgetUI();
+    submitBtn.disabled = true;
+
+    updateBudgetUI(); // Ensure UI updates correctly
 }
+
   
 
 // Dummy logout function (clears localStorage and reloads the page)
@@ -411,6 +416,25 @@ function checkDarkMode() {
     darkModeToggle.innerText = "";
   }
 }
+
+function toggleMenu() {
+    const menu = document.getElementById("sideMenu");
+    if (menu.style.right === "0px") {
+        menu.style.right = "-250px"; // Hide menu
+    } else {
+        menu.style.right = "0px"; // Show menu
+    }
+}
+
+// Close the menu when clicking outside of it
+document.addEventListener("click", function(event) {
+    const menu = document.getElementById("sideMenu");
+    const menuButton = document.getElementById("menuToggle");
+    if (!menu.contains(event.target) && !menuButton.contains(event.target)) {
+        menu.style.right = "-250px"; // Hide menu when clicking outside
+    }
+});
+
 
 checkDarkMode();
 populateGrid();
